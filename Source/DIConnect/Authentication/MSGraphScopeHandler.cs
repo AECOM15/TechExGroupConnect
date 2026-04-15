@@ -10,6 +10,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Authentication
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authorization;
+    using Microsoft.Extensions.Logging;
     using Microsoft.Identity.Web;
 
     /// <summary>
@@ -18,14 +19,19 @@ namespace Microsoft.Teams.Apps.DIConnect.Authentication
     public class MSGraphScopeHandler : AuthorizationHandler<MSGraphScopeRequirement>
     {
         private readonly ITokenAcquisition tokenAcquisition;
+        private readonly ILogger<MSGraphScopeHandler> logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MSGraphScopeHandler"/> class.
         /// </summary>
         /// <param name="tokenAcquisition">MSAL.NET token acquisition service.</param>
-        public MSGraphScopeHandler(ITokenAcquisition tokenAcquisition)
+        /// <param name="logger">Logger instance.</param>
+        public MSGraphScopeHandler(
+            ITokenAcquisition tokenAcquisition,
+            ILogger<MSGraphScopeHandler> logger)
         {
             this.tokenAcquisition = tokenAcquisition;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -36,10 +42,19 @@ namespace Microsoft.Teams.Apps.DIConnect.Authentication
         /// <returns>A task that represents the work queued to execute.</returns>
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, MSGraphScopeRequirement requirement)
         {
-            var hasScope = await this.HasScopesAsync(requirement.Scopes);
-            if (hasScope)
+            try
             {
-                context.Succeed(requirement);
+                var hasScope = await this.HasScopesAsync(requirement.Scopes);
+                if (hasScope)
+                {
+                    context.Succeed(requirement);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(ex, "Failed to acquire token for Graph scopes. The user or admin may not have consented to the required permissions.");
+
+                // Do not call context.Succeed — authorization will fail with 403 instead of crashing with 500.
             }
         }
 

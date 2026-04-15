@@ -75,11 +75,6 @@ namespace Microsoft.Teams.Apps.DIConnect.Bot
         private readonly IFeedbackDataRepository feedbackDataRepository;
 
         /// <summary>
-        /// Response generating from QnA maker knowledge base service.
-        /// </summary>
-        private readonly KnowledgeBaseResponse knowledgeBaseResponse;
-
-        /// <summary>
         /// Helper for working with bot notification card.
         /// </summary>
         private readonly NotificationCardHelper notificationCardHelper;
@@ -131,7 +126,6 @@ namespace Microsoft.Teams.Apps.DIConnect.Bot
         /// <param name="teamsDataCapture">Teams data capture service.</param>
         /// <param name="employeeResourceGroupRepository">Instance of employee resource group repository.</param>
         /// <param name="teamNotification">Send team notification service.</param>
-        /// <param name="knowledgeBaseResponse">Knowledge base response instance.</param>
         /// <param name="feedbackDataRepository">Feedback data repository instance.</param>
         /// <param name="notificationCardHelper">Notification card helper instance.</param>
         /// <param name="botOptions">A set of key/value application bot configuration properties.</param>
@@ -143,7 +137,6 @@ namespace Microsoft.Teams.Apps.DIConnect.Bot
             ILogger<UserTeamsActivityHandler> logger,
             TeamsDataCapture teamsDataCapture,
             IEmployeeResourceGroupRepository employeeResourceGroupRepository,
-            KnowledgeBaseResponse knowledgeBaseResponse,
             IFeedbackDataRepository feedbackDataRepository,
             NotificationCardHelper notificationCardHelper,
             IOptions<BotOptions> botOptions,
@@ -157,7 +150,6 @@ namespace Microsoft.Teams.Apps.DIConnect.Bot
             this.teamsDataCapture = teamsDataCapture ?? throw new ArgumentNullException(nameof(teamsDataCapture));
             this.employeeResourceGroupRepository = employeeResourceGroupRepository ?? throw new ArgumentNullException(nameof(employeeResourceGroupRepository));
             this.teamsDataCapture = teamsDataCapture ?? throw new ArgumentNullException(nameof(teamsDataCapture));
-            this.knowledgeBaseResponse = knowledgeBaseResponse ?? throw new ArgumentNullException(nameof(knowledgeBaseResponse));
             this.feedbackDataRepository = feedbackDataRepository ?? throw new ArgumentNullException(nameof(feedbackDataRepository));
             this.notificationCardHelper = notificationCardHelper ?? throw new ArgumentNullException(nameof(notificationCardHelper));
             this.teamNotification = teamNotification ?? throw new ArgumentNullException(nameof(teamNotification));
@@ -328,7 +320,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Bot
                     }
                     else
                     {
-                        await this.knowledgeBaseResponse.SendReplyToQuestionAsync(turnContext, activity.Text);
+                        await turnContext.SendActivityAsync(this.localizer.GetString("UnSupportedBotCommand"));
                     }
                 }
                 else if (activity.Conversation.ConversationType == ChannelConversationType)

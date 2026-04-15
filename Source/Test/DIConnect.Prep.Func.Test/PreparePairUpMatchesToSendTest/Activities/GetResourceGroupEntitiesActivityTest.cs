@@ -62,7 +62,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Prep.Func.Test.PreparePairUpMatchesToSe
             Func<Task> task = async () => await getResourceGroupEntitiesActivity.RunAsync(matchingFrequency.ToString(), logger.Object);
 
             // Assert
-            task.Should().NotThrow();
+            await task.Should().NotThrowAsync();
         }
 
         /// <summary>

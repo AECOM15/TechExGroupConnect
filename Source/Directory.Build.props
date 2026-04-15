@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <!-- Disable .NET code analyzers (CA rules) that were not active on netcoreapp3.1/netstandard2.1.
+         StyleCop.Analyzers (referenced as a PackageReference) continues to work independently. -->
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+  </PropertyGroup>
+</Project>

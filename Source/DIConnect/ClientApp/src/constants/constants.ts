@@ -11,7 +11,6 @@ export default class Constants {
     public static readonly maxLengthName: number = 100;
     public static readonly maxLengthDescription: number = 300;
     public static readonly maxLengthResourceDescription: number = 500;
-    public static readonly maxLengthKnowledgeBaseId: number = 50;
     public static readonly maxLengthERGButtonDisplayText: number = 30;
     public static readonly groupCreatedBotCommand: string = "Group created";
     public static readonly editTaskModuleHeight: number = 800;

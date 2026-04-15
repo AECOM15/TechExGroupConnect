@@ -86,60 +86,6 @@ namespace Microsoft.Teams.Apps.DIConnect.Tests.Helpers
         }
 
         /// <summary>
-        /// Test case to check if QnA response card is not null and have valid contents.
-        /// </summary>
-        [TestMethod]
-        public void QnAResponseCardNotNullValidContent()
-        {
-            // ARRANGE
-            this.hostingEnvironment
-                .Setup(m => m.ContentRootPath)
-                .Returns(".");
-
-            this.memoryCache
-                .Setup(x => x.CreateEntry(It.IsAny<object>()))
-                .Returns(Mock.Of<ICacheEntry>);
-
-            var cardTemplate = File.ReadAllText(CardHelpersData.QnAResponseCardFilePath);
-            var expectedCardJson = Newtonsoft.Json.JsonConvert.SerializeObject(AdaptiveCard.FromJson(cardTemplate).Card);
-
-            // ACT
-            var actualAttachmentCardResult = this.cardHelper.GetQnAResponseNotificationCard(questionText, answerText, CardHelpersData.emptyPrompts, appbaseUri);
-            var actualCardJson = Newtonsoft.Json.JsonConvert.SerializeObject(actualAttachmentCardResult.Content);
-
-            // ASSERT
-            Assert.IsNotNull(actualAttachmentCardResult);
-            Assert.AreEqual(expectedCardJson, actualCardJson);
-        }
-
-        /// <summary>
-        /// Test case to check if QnA with prompts response card is not null and have valid contents.
-        /// </summary>
-        [TestMethod]
-        public void QnAWithPromptsResponseCardNotNullValidContent()
-        {
-            // ARRANGE
-            this.hostingEnvironment
-                .Setup(m => m.ContentRootPath)
-                .Returns(".");
-
-            this.memoryCache
-                .Setup(x => x.CreateEntry(It.IsAny<object>()))
-                .Returns(Mock.Of<ICacheEntry>);
-
-            var cardTemplate = File.ReadAllText(CardHelpersData.QnAWithPromptsResponseCardFilePath);
-            var expectedCardJson = Newtonsoft.Json.JsonConvert.SerializeObject(AdaptiveCard.FromJson(cardTemplate).Card);
-
-            // ACT
-            var actualAttachmentCardResult = this.cardHelper.GetQnAResponseNotificationCard(questionText, answerText, CardHelpersData.prompts, appbaseUri);
-            var actualCardJson = Newtonsoft.Json.JsonConvert.SerializeObject(actualAttachmentCardResult.Content);
-
-            // ASSERT
-            Assert.IsNotNull(actualAttachmentCardResult);
-            Assert.AreEqual(expectedCardJson, actualCardJson);
-        }
-
-        /// <summary>
         /// Test case to check if approval card is not null and have valid contents.
         /// </summary>
         [TestMethod]

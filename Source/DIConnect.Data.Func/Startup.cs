@@ -16,6 +16,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Data.Func
     using Microsoft.Bot.Connector.Authentication;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Teams.Apps.DIConnect.Common.Adapter;
     using Microsoft.Teams.Apps.DIConnect.Common.Repositories;
     using Microsoft.Teams.Apps.DIConnect.Common.Repositories.ExportData;
     using Microsoft.Teams.Apps.DIConnect.Common.Repositories.NotificationData;
@@ -68,6 +69,9 @@ namespace Microsoft.Teams.Apps.DIConnect.Data.Func
 
                    botOptions.AuthorAppPassword =
                        configuration.GetValue<string>("AuthorAppPassword");
+
+                   botOptions.TenantId =
+                       configuration.GetValue<string>("TenantId");
                });
             builder.Services.AddOptions<CleanUpFileOptions>()
                .Configure<IConfiguration>((cleanUpFileOptions, configuration) =>
@@ -100,7 +104,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Data.Func
             // Add bot services.
             builder.Services.AddSingleton<UserAppCredentials>();
             builder.Services.AddSingleton<ICredentialProvider, ConfigurationCredentialProvider>();
-            builder.Services.AddSingleton<BotFrameworkHttpAdapter>();
+            builder.Services.AddSingleton<BotFrameworkHttpAdapter, SingleTenantBotFrameworkHttpAdapter>();
 
             // Add services.
             builder.Services.AddSingleton<IFileCardService, FileCardService>();

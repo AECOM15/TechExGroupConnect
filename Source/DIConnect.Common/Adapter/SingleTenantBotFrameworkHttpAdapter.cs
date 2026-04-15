@@ -1,45 +1,37 @@
-﻿// <copyright file="DIBotFrameworkHttpAdapter.cs" company="Microsoft Corporation">
+// <copyright file="SingleTenantBotFrameworkHttpAdapter.cs" company="Microsoft Corporation">
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 // </copyright>
 
 namespace Microsoft.Teams.Apps.DIConnect.Common.Adapter
 {
-    using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.Bot.Builder;
     using Microsoft.Bot.Builder.Integration.AspNet.Core;
     using Microsoft.Bot.Connector.Authentication;
-    using Microsoft.Bot.Schema;
     using Microsoft.Extensions.Options;
     using Microsoft.Teams.Apps.DIConnect.Common.Services.CommonBot;
 
     /// <summary>
-    /// Bot framework http adapter instance.
+    /// A BotFrameworkHttpAdapter that supports single-tenant bot registrations
+    /// by including the tenant ID when building credentials.
     /// </summary>
-    public class DIBotFrameworkHttpAdapter : BotFrameworkHttpAdapter, IDIBotFrameworkHttpAdapter
+    public class SingleTenantBotFrameworkHttpAdapter : BotFrameworkHttpAdapter
     {
         private readonly ICredentialProvider credentialProvider;
         private readonly string tenantId;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DIBotFrameworkHttpAdapter"/> class.
+        /// Initializes a new instance of the <see cref="SingleTenantBotFrameworkHttpAdapter"/> class.
         /// </summary>
-        /// <param name="credentialProvider">credential provider.</param>
+        /// <param name="credentialProvider">The credential provider.</param>
         /// <param name="botOptions">The bot options containing the tenant ID.</param>
-        public DIBotFrameworkHttpAdapter(
+        public SingleTenantBotFrameworkHttpAdapter(
             ICredentialProvider credentialProvider,
             IOptions<BotOptions> botOptions)
             : base(credentialProvider)
         {
             this.credentialProvider = credentialProvider;
             this.tenantId = botOptions?.Value?.TenantId;
-        }
-
-        /// <inheritdoc/>
-        public override Task CreateConversationAsync(string channelId, string serviceUrl, MicrosoftAppCredentials credentials, ConversationParameters conversationParameters, BotCallbackHandler callback, CancellationToken cancellationToken)
-        {
-            return base.CreateConversationAsync(channelId, serviceUrl, credentials, conversationParameters, callback, cancellationToken);
         }
 
         /// <inheritdoc/>

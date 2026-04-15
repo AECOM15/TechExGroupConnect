@@ -115,11 +115,6 @@ namespace Microsoft.Teams.Apps.DIConnect.Controllers
                 }
 
                 await this.appConfigRepository.CreateOrUpdateAsync(this.ConvertToConfigEntity(
-                    AppConfigTableName.FAQConfigurationRowKey,
-                    configurationData.QnAMakerKnowledgeBaseId,
-                    configurationData.IsQnAEnabled));
-
-                await this.appConfigRepository.CreateOrUpdateAsync(this.ConvertToConfigEntity(
                         AppConfigTableName.ERGConfigurationRowKey,
                         configurationData.RegisterERGButtonDisplayText,
                         configurationData.IsERGCreationRestrictedToGlobalTeam));

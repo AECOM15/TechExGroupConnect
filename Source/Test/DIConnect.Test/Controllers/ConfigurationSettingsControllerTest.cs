@@ -80,7 +80,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Test.Controllers
         }
 
         /// <summary>
-        /// Update FAQ and group Configuration into storage.
+        /// Update ERG Configuration into storage.
         /// </summary>
         /// <returns>Update configuration.</returns>
         [Fact]
@@ -88,23 +88,13 @@ namespace Microsoft.Teams.Apps.DIConnect.Test.Controllers
         {
             // Arrange
             var getConfigurationSettingsController = this.GetConfigurationSettingsController();
-            string partitionKey = "Settings";
-            string rowKey = "KnowledgeBaseId";
-            string value = "value";
-            var id = new ConfigurationData() { QnAMakerKnowledgeBaseId = "id" };
-            AppConfigEntity appConfigEntity = new AppConfigEntity()
-            {
-                PartitionKey = partitionKey,
-                RowKey = rowKey,
-                Value = value,
-            };
-            this.appConfigRepository.Setup(x => x.GetAsync(partitionKey, rowKey)).ReturnsAsync(appConfigEntity);
+            var configData = new ConfigurationData() { RegisterERGButtonDisplayText = "Add group" };
 
             // Act
-            var result = await getConfigurationSettingsController.UpdateConfiguration(id);
+            var result = await getConfigurationSettingsController.UpdateConfiguration(configData);
 
             // Assert
-            Assert.Equal(id.QnAMakerKnowledgeBaseId, id.QnAMakerKnowledgeBaseId);
+            Assert.NotNull(result);
         }
 
         /// <summary>

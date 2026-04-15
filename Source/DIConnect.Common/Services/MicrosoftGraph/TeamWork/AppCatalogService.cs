@@ -39,7 +39,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Common.Services.MicrosoftGraph
                 .AppCatalogs
                 .TeamsApps
                 .Request()
-                .Header(Common.Constants.PermissionTypeKey, GraphPermissionType.Delegate.ToString())
+                .Header(Common.Constants.PermissionTypeKey, GraphPermissionType.Application.ToString())
                 .Filter($"distributionMethod eq 'organization' and externalId eq '{externalId}'")
                 .GetAsync();
 

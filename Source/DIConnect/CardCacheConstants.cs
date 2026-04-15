@@ -36,11 +36,6 @@ namespace Microsoft.Teams.Apps.DIConnect
         public const string ShareFeedbackJsonTemplate = "_SFBJTemplate";
 
         /// <summary>
-        /// Cache key for QnA response card template.
-        /// </summary>
-        public const string QnAResponseJsonTemplate = "_QARJTemplate";
-
-        /// <summary>
         /// Cache key for admin team approve/reject card template.
         /// </summary>
         public const string AdminApprovalCardJsonTemplate = "_AAJTemplate";

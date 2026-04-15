@@ -8,7 +8,6 @@ namespace Microsoft.Teams.Apps.DIConnect
     using System;
     using System.Linq;
     using System.Net;
-    using System.Threading.Tasks;
     using global::Azure.Identity;
     using global::Azure.Security.KeyVault.Secrets;
     using global::Azure.Storage.Blobs;
@@ -16,9 +15,6 @@ namespace Microsoft.Teams.Apps.DIConnect
     using Microsoft.AspNetCore.Diagnostics;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
-    using Microsoft.Azure.CognitiveServices.Knowledge.QnAMaker;
     using Microsoft.Bot.Builder.Integration.AspNet.Core;
     using Microsoft.Bot.Connector.Authentication;
     using Microsoft.Extensions.Configuration;
@@ -107,6 +103,7 @@ namespace Microsoft.Teams.Apps.DIConnect
                     botOptions.AppBaseUri = configuration.GetValue<string>("AppBaseUri");
                     botOptions.AdminTeamId = ParseTeamIdExtension.GetTeamIdFromDeepLink(configuration.GetValue<string>("AdminTeamLink"));
                     botOptions.ManifestId = configuration.GetValue<string>("ManifestId");
+                    botOptions.TenantId = configuration.GetValue<string>("TenantId");
                 });
 
             services.AddOptions<BotFilterMiddlewareOptions>()
@@ -153,13 +150,6 @@ namespace Microsoft.Teams.Apps.DIConnect
                         configuration.GetValue<string>("UserAppExternalId", "148a66bb-e83d-425a-927d-09f4299a9274");
                 });
 
-            services.AddOptions<QnAMakerSettings>()
-               .Configure<IConfiguration>((options, configuration) =>
-               {
-                   options.ScoreThreshold =
-                       configuration.GetValue<double>("ScoreThreshold", 0.5);
-               });
-
             services.AddOptions();
 
             // Add localization services.
@@ -186,7 +176,8 @@ namespace Microsoft.Teams.Apps.DIConnect
             // The bot needs an HttpClient to download and upload files.
             services.AddHttpClient();
 
-            services.AddSingleton<BotFrameworkHttpAdapter>();
+            // Use tenant-aware adapter for single-tenant bot registrations.
+            services.AddSingleton<BotFrameworkHttpAdapter, Common.Adapter.SingleTenantBotFrameworkHttpAdapter>();
 
             // Add bot services.
             services.AddTransient<UserTeamsActivityHandler>();
@@ -197,7 +188,6 @@ namespace Microsoft.Teams.Apps.DIConnect
             services.AddTransient<AdminTeamNotifier>();
             services.AddTransient<TeamsDataCapture>();
             services.AddTransient<TeamsFileUpload>();
-            services.AddTransient<KnowledgeBaseResponse>();
             services.AddTransient<NotificationCardHelper>();
 
             // Add repositories.
@@ -222,18 +212,12 @@ namespace Microsoft.Teams.Apps.DIConnect
 
             // Add Microsoft graph services.
             services.AddScoped<IAuthenticationProvider, GraphTokenProvider>();
-            services.AddScoped<IGraphServiceClient, GraphServiceClient>();
+            services.AddScoped<IGraphServiceClient>(sp =>
+                new GraphServiceClient(sp.GetRequiredService<IAuthenticationProvider>()));
             services.AddScoped<IGraphServiceFactory, GraphServiceFactory>();
             services.AddScoped<IGroupMembersService>(sp => sp.GetRequiredService<IGraphServiceFactory>().GetGroupMembersService());
             services.AddScoped<IGroupsService>(sp => sp.GetRequiredService<IGraphServiceFactory>().GetGroupsService());
             services.AddScoped<IAppCatalogService>(sp => sp.GetRequiredService<IGraphServiceFactory>().GetAppCatalogService());
-            IQnAMakerClient qnaMakerClient = new QnAMakerClient(new ApiKeyServiceClientCredentials(this.Configuration["QnAMakerSubscriptionKey"])) { Endpoint = this.Configuration["QnAMakerApiEndpointUrl"] };
-            string endpointKey = Task.Run(() => qnaMakerClient.EndpointKeys.GetKeysAsync()).Result.PrimaryEndpointKey;
-
-            services.AddSingleton<IQnAService>((provider) => new QnAService(
-                provider.GetRequiredService<IOptionsMonitor<QnAMakerSettings>>(),
-                new QnAMakerRuntimeClient(new EndpointKeyServiceClientCredentials(endpointKey)) { RuntimeEndpoint = this.Configuration["QnAMakerHostUrl"] }));
-            services.AddScoped<IGroupMembersService>(sp => sp.GetRequiredService<IGraphServiceFactory>().GetGroupMembersService());
 
             // Add Application Insights telemetry.
             services.AddApplicationInsightsTelemetry();
@@ -250,11 +234,6 @@ namespace Microsoft.Teams.Apps.DIConnect
             // Add helper class.
             services.AddSingleton<UserTeamMappingsHelper>();
             services.AddSingleton<CardHelper>();
-
-            services.Configure<MvcOptions>(options =>
-            {
-                options.EnableEndpointRouting = false;
-            });
         }
 
         /// <summary>
@@ -270,7 +249,6 @@ namespace Microsoft.Teams.Apps.DIConnect
             app.UseSpaStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
-            app.UseMvc();
             app.UseAuthorization();
             app.UseRequestLocalization();
 
@@ -284,11 +262,6 @@ namespace Microsoft.Teams.Apps.DIConnect
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";
-
-                if (env.IsDevelopment())
-                {
-                    spa.UseReactDevelopmentServer(npmScript: "start");
-                }
             });
         }
 
@@ -355,7 +328,6 @@ namespace Microsoft.Teams.Apps.DIConnect
             this.Configuration["UserAppPassword"] = client.GetSecret("UserAppPassword").Value.Value;
             this.Configuration["StorageAccountConnectionString"] = client.GetSecret("StorageAccountConnectionString--SecretKey").Value.Value;
             this.Configuration["ServiceBusConnection"] = client.GetSecret("ServiceBusConnection--SecretKey").Value.Value;
-            this.Configuration["QnAMakerSubscriptionKey"] = client.GetSecret("QnAMakerSubscriptionKey").Value.Value;
         }
     }
 }

@@ -8,13 +8,11 @@ namespace Microsoft.Teams.Apps.DIConnect.Authentication
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Microsoft.AspNetCore.Authentication.AzureAD.UI;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Identity.Web;
-    using Microsoft.Identity.Web.TokenCacheProviders.InMemory;
     using Microsoft.IdentityModel.Tokens;
 
     /// <summary>
@@ -46,18 +44,12 @@ namespace Microsoft.Teams.Apps.DIConnect.Authentication
         {
             AuthenticationServiceCollectionExtensions.ValidateAuthenticationOptions(authenticationOptions);
 
-            services.AddProtectedWebApi(configuration)
-                    .AddProtectedWebApiCallsProtectedWebApi(configuration)
+            services.AddMicrosoftIdentityWebApiAuthentication(configuration)
+                    .EnableTokenAcquisitionToCallDownstreamApi()
                     .AddInMemoryTokenCaches();
             services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {
-                var azureADOptions = new AzureADOptions
-                {
-                    Instance = authenticationOptions.AzureAdInstance,
-                    TenantId = authenticationOptions.AzureAdTenantId,
-                    ClientId = authenticationOptions.AzureAdClientId,
-                };
-                options.Authority = $"{azureADOptions.Instance}{azureADOptions.TenantId}/v2.0";
+                options.Authority = $"{authenticationOptions.AzureAdInstance}{authenticationOptions.AzureAdTenantId}/v2.0";
                 options.SaveToken = true;
                 options.TokenValidationParameters.ValidAudiences = AuthenticationServiceCollectionExtensions.GetValidAudiences(authenticationOptions);
                 options.TokenValidationParameters.AudienceValidator = AuthenticationServiceCollectionExtensions.AudienceValidator;

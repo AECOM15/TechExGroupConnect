@@ -261,7 +261,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Test.Controllers
             Func<Task> task = async () => await employeeResourceGroupController.GetAllEmployeeResourceGroups();
 
             // Assert
-            task.Should().NotThrow();
+            await task.Should().NotThrowAsync();
             this.employeeResourceGroupRepository.Verify(x => x.GetAllAsync(partition, count));
         }
 
@@ -304,7 +304,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Test.Controllers
             Func<Task> task = async () => await employeeResourceGroupController.GetEmployeeResourceGroupByTeamId(id, groupId);
 
             // Assert
-            task.Should().NotThrow();
+            await task.Should().NotThrowAsync();
             this.employeeResourceGroupRepository.Verify(x => x.GetResourceGroupByTeamIdAsync(It.Is<string>(x => x.Equals(employeeResourceGroupEntity.TeamId))), Times.Once());
         }
 

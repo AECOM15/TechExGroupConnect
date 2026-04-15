@@ -46,7 +46,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Common.Services.MicrosoftGraph
                                 .Request()
                                 .WithMaxRetry(this.MaxRetry)
                                 .Select(gr => new { gr.Id, gr.Mail, gr.DisplayName, gr.Visibility, })
-                                .Header(Common.Constants.PermissionTypeKey, GraphPermissionType.Delegate.ToString())
+                                .Header(Common.Constants.PermissionTypeKey, GraphPermissionType.Application.ToString())
                                 .GetAsync();
                 yield return group;
             }
@@ -80,7 +80,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Common.Services.MicrosoftGraph
         {
             var owners = await this.graphServiceClient.Groups[groupId].Owners
                 .Request()
-                .Header(Common.Constants.PermissionTypeKey, GraphPermissionType.Delegate.ToString())
+                .Header(Common.Constants.PermissionTypeKey, GraphPermissionType.Application.ToString())
                 .GetAsync();
 
             return owners.Select(row => row.Id).ToHashSet();
@@ -110,7 +110,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Common.Services.MicrosoftGraph
         {
             var team = await this.graphServiceClient.Teams[groupId]
                 .Request()
-                .Header(Common.Constants.PermissionTypeKey, GraphPermissionType.Delegate.ToString())
+                .Header(Common.Constants.PermissionTypeKey, GraphPermissionType.Application.ToString())
                 .GetAsync();
 
             return new Group() { DisplayName = team.DisplayName, Description = team.Description };
@@ -214,7 +214,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Common.Services.MicrosoftGraph
                                        group.GroupTypes,
                                    }).
                                    Top(resultCount)
-                                   .Header(Common.Constants.PermissionTypeKey, GraphPermissionType.Delegate.ToString())
+                                   .Header(Common.Constants.PermissionTypeKey, GraphPermissionType.Application.ToString())
                                    .GetAsync();
         }
     }

@@ -9,16 +9,14 @@ import { TFunction } from 'i18next';
 import { withTranslation, WithTranslation } from "react-i18next";
 import { RouteComponentProps } from 'react-router-dom';
 import { Flex, Text, Input, Alert, Button, Checkbox, Loader } from '@fluentui/react-northstar';
-import { updateConfiguration, getFAQConfiguration, getERGConfiguration } from '../../apis/configurationSettingsApi';
+import { updateConfiguration, getERGConfiguration } from '../../apis/configurationSettingsApi';
 import Constants from '../../constants/constants';
 import './configurationTab.scss';
 
 export interface IUpdateConfigurationState {
     loading: boolean,
     theme: string;
-    knowledgeBaseId: string;
     ergDisplayButtonText: string;
-    isKnowledgeBaseIdPresent: boolean;
     isERGDisplayButtonTextPresent: boolean;
     isFaqEnabled: boolean;
     isERGEnabledForTeam: boolean;
@@ -37,9 +35,7 @@ class UpdateConfiguration extends React.Component<UpdateConfigurationProps, IUpd
         this.state = {
             loading: true,
             theme:"",
-            knowledgeBaseId: "",
             ergDisplayButtonText: this.localize('RegisterNewERGDefaultButtonText'),
-            isKnowledgeBaseIdPresent: true,
             isERGDisplayButtonTextPresent: true,
             isFaqEnabled: false,
             isERGEnabledForTeam: false,
@@ -54,9 +50,8 @@ class UpdateConfiguration extends React.Component<UpdateConfigurationProps, IUpd
                 theme: context.theme!,
             });
         });
-        let [isFaqEnabled, isERGEnabledForTeam] = await Promise.all([await this.getFAQConfigurationDetails(), await this.getERGConfigurationDetails()]);
+        let isERGEnabledForTeam = await this.getERGConfigurationDetails();
         this.setState({
-            isFaqEnabled: isFaqEnabled,
             isERGEnabledForTeam: isERGEnabledForTeam,
             loading: false
         });
@@ -88,37 +83,9 @@ class UpdateConfiguration extends React.Component<UpdateConfigurationProps, IUpd
     }
 
     /**
-    * Method to get FAQ configuration details.
-    */
-    private getFAQConfigurationDetails = async () => {
-        try {
-            const response = await getFAQConfiguration();
-            if (response.status === 200 && response.data) {
-                this.setState({
-                    knowledgeBaseId: response.data.value
-                });
-                return response.data.isEnabled;
-            }
-        } catch (error) {
-            // Knowledge base id will be empty for first run experience. Handling 404 error to provide input from user.
-            if (error.response.status === 404) {
-                this.setState({ loading: false });
-            }
-            else {
-                throw error;
-            }
-        }
-    }
-
-    /**
     *Submit configuration details
     */
     private handleSubmit = async () => {
-        if (!this.state.knowledgeBaseId && this.state.isFaqEnabled) {
-            this.setState({ isKnowledgeBaseIdPresent: false});
-            return;
-        }
-
         if (!this.state.ergDisplayButtonText) {
             this.setState({ isERGDisplayButtonTextPresent: false });
             return;
@@ -126,22 +93,12 @@ class UpdateConfiguration extends React.Component<UpdateConfigurationProps, IUpd
 
         this.setState({ submitLoading: true });
         let configurationData: object = {
-            qnAMakerKnowledgeBaseId: this.state.knowledgeBaseId,
             registerERGButtonDisplayText: this.state.ergDisplayButtonText,
-            isQnAEnabled: this.state.isFaqEnabled,
             isERGCreationRestrictedToGlobalTeam: this.state.isERGEnabledForTeam
         };
 
         await updateConfiguration(configurationData);
         microsoftTeams.tasks.submitTask();
-    }
-
-    /**
-     * Handling faq enable check box change event.
-     * @param isChecked | boolean value.
-     */
-    private onIsFaqEnabled = (isChecked: boolean): void => {
-        this.setState({ isFaqEnabled: !isChecked });
     }
 
     /**
@@ -152,14 +109,6 @@ class UpdateConfiguration extends React.Component<UpdateConfigurationProps, IUpd
         this.setState({ isERGEnabledForTeam: !isChecked });
     }
 
-    /**
-    *Sets knowledge base id state.
-    *@param value Knowledge base id string
-    */
-    private onKnowledgeBaseInputChange = (value: string) => {
-        this.setState({ knowledgeBaseId: value, isKnowledgeBaseIdPresent: true });
-    }
-   
     /**
     *Sets ERG display button text state.
     *@param value ERG display button text string
@@ -185,34 +134,6 @@ class UpdateConfiguration extends React.Component<UpdateConfigurationProps, IUpd
             return (
                 <div className={this.state.theme === "default" ? "backgroundcolor" : ""} >
                     <Flex className="module-container" column>
-                        <Flex className="top-padding">
-                            <Text className="margin-space" weight="bold" content={this.localize('QnAMakerConfigurationText')}/>
-                        </Flex>
-                        <Alert info className="top-padding"
-                            content={<Flex className="top-padding"><Text className="margin-space" content={this.localize('QnAFeatureText')}/>
-                                <Flex.Item push>
-                                    <Flex hAlign="end" >
-                                        <Checkbox className="checkbox" toggle checked={this.state.isFaqEnabled} onChange={() => this.onIsFaqEnabled(this.state.isFaqEnabled)} />
-                                    </Flex>
-                                </Flex.Item>
-                                </Flex>}
-                         />
-                        <Flex className="top-padding">
-                            <Text size="small" content={this.localize('QnAMakerTitleText')} className="margin-space" />
-                            <Flex.Item push>
-                                {this.getRequiredFieldError(this.state.isKnowledgeBaseIdPresent)}
-                            </Flex.Item>
-                        </Flex>
-                        <Flex>
-                            <Input
-                                className="between-space"
-                                maxLength={Constants.maxLengthKnowledgeBaseId}
-                                fluid
-                                value={this.state.knowledgeBaseId}
-                                placeholder={this.localize('QnAMakerInputPlaceholderText')}
-                                onChange={(event: any) => this.onKnowledgeBaseInputChange(event.target.value)}
-                            />
-                        </Flex>
                         <div className="configuration-seperation">
                             <Flex className="top-padding">
                                 <Text className="margin-space" size="medium" weight="bold" content={this.localize('ERGConfigurationText')}/>

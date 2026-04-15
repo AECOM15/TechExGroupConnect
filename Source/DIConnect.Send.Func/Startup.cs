@@ -15,6 +15,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Send.Func
     using Microsoft.Bot.Connector.Authentication;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Teams.Apps.DIConnect.Common.Adapter;
     using Microsoft.Teams.Apps.DIConnect.Common.Repositories;
     using Microsoft.Teams.Apps.DIConnect.Common.Repositories.NotificationData;
     using Microsoft.Teams.Apps.DIConnect.Common.Repositories.SentNotificationData;
@@ -52,6 +53,8 @@ namespace Microsoft.Teams.Apps.DIConnect.Send.Func
 
                     botOptions.UserAppPassword =
                         configuration.GetValue<string>("UserAppPassword");
+                    botOptions.TenantId =
+                        configuration.GetValue<string>("TenantId");
                 });
             builder.Services.AddOptions<RepositoryOptions>()
                 .Configure<IConfiguration>((repositoryOptions, configuration) =>
@@ -82,7 +85,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Send.Func
             // Add bot services.
             builder.Services.AddSingleton<UserAppCredentials>();
             builder.Services.AddSingleton<ICredentialProvider, ConfigurationCredentialProvider>();
-            builder.Services.AddSingleton<BotFrameworkHttpAdapter>();
+            builder.Services.AddSingleton<BotFrameworkHttpAdapter, SingleTenantBotFrameworkHttpAdapter>();
 
             // Add teams services.
             builder.Services.AddTransient<IMessageService, MessageService>();

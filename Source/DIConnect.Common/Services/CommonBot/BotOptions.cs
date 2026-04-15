@@ -44,5 +44,10 @@ namespace Microsoft.Teams.Apps.DIConnect.Common.Services.CommonBot
         /// Gets or sets application manifest id.
         /// </summary>
         public string ManifestId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Azure AD tenant ID for single-tenant bot registrations.
+        /// </summary>
+        public string TenantId { get; set; }
     }
 }

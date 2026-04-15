@@ -5,7 +5,7 @@
 
 namespace Microsoft.Teams.Apps.DIConnect.Tests.Helpers
 {
-    using Microsoft.Azure.CognitiveServices.Knowledge.QnAMaker.Models;
+    using Microsoft.Teams.Apps.DIConnect.Common.Services;
     using Microsoft.Bot.Schema.Teams;
     using Microsoft.Teams.Apps.DIConnect.Common.Repositories.EmployeeResourceGroup;
     using Microsoft.Teams.Apps.DIConnect.Common.Repositories.UserPairupMapping;
@@ -52,16 +52,6 @@ namespace Microsoft.Teams.Apps.DIConnect.Tests.Helpers
         /// User pair up matches file path.
         /// </summary>
         public static readonly string UserPairUpMatchesCardFilePath = ".\\Helpers\\Cards\\UserPairUpMatchesCard_TestResult.json";
-
-        /// <summary>
-        /// QnA with prompts response card file path.
-        /// </summary>
-        public static readonly string QnAWithPromptsResponseCardFilePath = ".\\Helpers\\Cards\\QnAWithPromptsResponseCard_TestResult.json";
-
-        /// <summary>
-        /// QnA response card file path.
-        /// </summary>
-        public static readonly string QnAResponseCardFilePath = ".\\Helpers\\Cards\\QnAResponseCard_TestResult.json";
 
         /// <summary>
         /// Represents submit action data for teams behavior.
@@ -132,26 +122,6 @@ namespace Microsoft.Teams.Apps.DIConnect.Tests.Helpers
         /// Represents empty list of team pair up mapping entities data.
         /// </summary>
         public static readonly IEnumerable<TeamUserPairUpMappingEntity> emptyEntities = new List<TeamUserPairUpMappingEntity>() { };
-
-        /// <summary>
-        /// Represents list of prompts data.
-        /// </summary>
-        public static readonly IList<PromptDTO> prompts = new List<PromptDTO>()
-        {
-           new PromptDTO()
-           {
-               DisplayText = "Prompt question 1"
-           },
-           new PromptDTO()
-           { 
-               DisplayText = "Prompt question 2"
-           },
-        };
-
-        /// <summary>
-        /// Represents empty list of prompts data.
-        /// </summary>
-        public static readonly IList<PromptDTO> emptyPrompts = new List<PromptDTO>() { };
         
     }
 }

@@ -13,7 +13,6 @@ namespace Microsoft.Teams.Apps.DIConnect.Helpers
     using AdaptiveCards;
     using AdaptiveCards.Templating;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.Azure.CognitiveServices.Knowledge.QnAMaker.Models;
     using Microsoft.Bot.Schema;
     using Microsoft.Bot.Schema.Teams;
     using Microsoft.Extensions.Caching.Memory;
@@ -24,6 +23,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Helpers
     using Microsoft.Teams.Apps.DIConnect.Common.Repositories.EmployeeResourceGroup;
     using Microsoft.Teams.Apps.DIConnect.Common.Repositories.UserPairupMapping;
     using Microsoft.Teams.Apps.DIConnect.Common.Resources;
+    using Microsoft.Teams.Apps.DIConnect.Common.Services;
     using Microsoft.Teams.Apps.DIConnect.Common.Services.CommonBot;
     using Microsoft.Teams.Apps.DIConnect.Models;
     using Microsoft.Teams.Apps.DIConnect.Models.CardSetting;
@@ -34,11 +34,6 @@ namespace Microsoft.Teams.Apps.DIConnect.Helpers
     /// </summary>
     public class CardHelper
     {
-        /// <summary>
-        /// Represents maximum prompt question count.
-        /// </summary>
-        private const int MaximumPromptQuestionCount = 4;
-
         /// <summary>
         /// Redirection url of tab.
         /// </summary>
@@ -53,11 +48,6 @@ namespace Microsoft.Teams.Apps.DIConnect.Helpers
         /// Represents the welcome card file name.
         /// </summary>
         private const string WelcomeCardFileName = "WelcomeCard.json";
-
-        /// <summary>
-        /// Represents the QnA response card file name.
-        /// </summary>
-        private const string QnAResponseCardFileName = "QnAResponseCard.json";
 
         /// <summary>
         /// Represents the share feedback card file name.
@@ -167,68 +157,6 @@ namespace Microsoft.Teams.Apps.DIConnect.Helpers
             };
 
             this.logger.LogInformation("Get welcome notification card succeeded.");
-
-            return attachment;
-        }
-
-        /// <summary>
-        /// This method will construct the QnA response notification card for user.
-        /// </summary>
-        /// <param name="question">Question from the user.</param>
-        /// <param name="answer">Knowledge base answer from QnA maker service.</param>
-        /// <param name="prompts">Prompts associated with the current question.</param>
-        /// <param name="appBaseUri">The base URI where the App is hosted.</param>
-        /// <returns>QnA response notification card attachment.</returns>
-        public Attachment GetQnAResponseNotificationCard(string question, string answer, IList<PromptDTO> prompts, string appBaseUri)
-        {
-            this.logger.LogInformation("Get QnA response notification card initiated.");
-            var qnAResponseCardContents = new QnAResponseCardData()
-            {
-                ResponseHeaderText = this.localizer.GetString("ResponseHeaderText"),
-                QuestionText = question,
-                AnswerText = answer,
-                IsPromptQuestionsPresent = prompts.Count > 0,
-                PromptHeaderText = this.localizer.GetString("PromptHeaderText"),
-                ShareFeedbackButtonText = this.localizer.GetString("ShareFeedbackText"),
-                FeedbackHeaderText = this.localizer.GetString("FeedbackHeaderText"),
-                FeedbackTitleText = this.localizer.GetString("FeedbackTitleText"),
-                HelpfulTitleText = this.localizer.GetString("HelpfulTitleText"),
-                NeedsImprovementTitleText = this.localizer.GetString("NeedsImprovementTitleText"),
-                NotHelpfulTitleText = this.localizer.GetString("NotHelpfulTitleText"),
-                ChoiceSetPlaceholder = this.localizer.GetString("ChoiceSetPlaceholder"),
-                DescriptionText = this.localizer.GetString("FeedbackLabelText"),
-                DescriptionPlaceHolderText = this.localizer.GetString("DescriptionPlaceHolderText"),
-                ShareButtonText = this.localizer.GetString("ShareButtonText"),
-                ShareCommand = Constants.ShareCommand,
-            };
-
-            if (prompts.Count != 0)
-            {
-                var promptLimit = prompts.Count > MaximumPromptQuestionCount ? prompts.Take(MaximumPromptQuestionCount) : prompts;
-                qnAResponseCardContents.ColumnSets = new List<ColumnData>();
-
-                foreach (var prompt in promptLimit)
-                {
-                    qnAResponseCardContents.ColumnSets.Add(new ColumnData()
-                    {
-                        ImageUrl = new Uri($"{appBaseUri}/Artifacts/Info.png"),
-                        PromptQuestion = prompt.DisplayText,
-                    });
-                }
-            }
-
-            var cardTemplate = this.GetCardTemplate(CardCacheConstants.QnAResponseJsonTemplate, QnAResponseCardFileName);
-
-            var template = new AdaptiveCardTemplate(cardTemplate);
-            var card = template.Expand(qnAResponseCardContents);
-
-            Attachment attachment = new Attachment()
-            {
-                ContentType = AdaptiveCard.ContentType,
-                Content = AdaptiveCard.FromJson(card).Card,
-            };
-
-            this.logger.LogInformation("Get QnA response notification card succeeded.");
 
             return attachment;
         }

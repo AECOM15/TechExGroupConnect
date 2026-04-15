@@ -80,6 +80,8 @@ namespace Microsoft.Teams.Apps.DIConnect.Prep.Func
                         configuration.GetValue<string>("AuthorAppId");
                     botOptions.AuthorAppPassword =
                         configuration.GetValue<string>("AuthorAppPassword");
+                    botOptions.TenantId =
+                        configuration.GetValue<string>("TenantId");
                 });
             builder.Services.AddOptions<DataQueueMessageOptions>()
                 .Configure<IConfiguration>((dataQueueMessageOptions, configuration) =>
@@ -110,7 +112,7 @@ namespace Microsoft.Teams.Apps.DIConnect.Prep.Func
             builder.Services.AddSingleton<AuthorAppCredentials>();
             builder.Services.AddSingleton<ICredentialProvider, ConfigurationCredentialProvider>();
             builder.Services.AddSingleton<IDIBotFrameworkHttpAdapter, DIBotFrameworkHttpAdapter>();
-            builder.Services.AddSingleton<BotFrameworkHttpAdapter>();
+            builder.Services.AddSingleton<BotFrameworkHttpAdapter, SingleTenantBotFrameworkHttpAdapter>();
 
             // Add repositories.
             builder.Services.AddSingleton<INotificationDataRepository, NotificationDataRepository>();

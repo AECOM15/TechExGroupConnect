@@ -20,7 +20,8 @@ namespace Microsoft.Teams.Apps.DIConnect.Common.Services.CommonBot
         public AuthorAppCredentials(IOptions<BotOptions> botOptions)
             : base(
                   appId: botOptions.Value.AuthorAppId,
-                  password: botOptions.Value.AuthorAppPassword)
+                  password: botOptions.Value.AuthorAppPassword,
+                  channelAuthTenant: botOptions.Value.TenantId)
         {
         }
     }

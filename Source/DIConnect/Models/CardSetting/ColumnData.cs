@@ -10,7 +10,6 @@ namespace Microsoft.Teams.Apps.DIConnect.Models.CardSetting
 
     /// <summary>
     /// Adaptive column data class.
-    /// This entity holds the content required for QnA response card.
     /// </summary>
     public class ColumnData
     {
