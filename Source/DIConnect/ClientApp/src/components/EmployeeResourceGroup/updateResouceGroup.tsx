@@ -129,7 +129,7 @@ class UpdateResouceGroup extends React.Component<IUpdateGroupProps, IState> {
 
         let params = this.props.match.params;
         if ('id' in params) {
-            let id = params['id'];
+            let id = params['id'] as any;
             await this.getResourceGroup(id);
             this.setState({
                 loading: false,

@@ -139,7 +139,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         this.setGroupAccess();
         this.getTeamList().then(() => {
             if ('id' in params) {
-                let id = params['id'];
+                let id = params['id'] as any;
                 this.getItem(id).then(() => {
                     const selectedTeams = this.makeDropdownItemList(this.state.selectedTeams, this.state.teams);
                     const selectedRosters = this.makeDropdownItemList(this.state.selectedRosters, this.state.teams);

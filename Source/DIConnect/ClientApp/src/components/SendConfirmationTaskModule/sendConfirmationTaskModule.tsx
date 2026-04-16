@@ -85,7 +85,7 @@ class SendConfirmationTaskModule extends React.Component<SendConfirmationTaskMod
         let params = this.props.match.params;
 
         if ('id' in params) {
-            let id = params['id'];
+            let id = params['id'] as any;
             this.getItem(id).then(() => {
                 getConsentSummaries(id).then((response) => {
                     this.setState({

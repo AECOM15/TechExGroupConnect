@@ -1,4 +1,4 @@
-// <copyright file="axiosJWTDecorator.ts" company="Microsoft Corporation">
+// <copyright file="httpClient.ts" company="Microsoft Corporation">
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 // </copyright>

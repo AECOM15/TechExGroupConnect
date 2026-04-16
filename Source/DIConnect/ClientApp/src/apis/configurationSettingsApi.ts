@@ -3,7 +3,7 @@
 // Licensed under the MIT License.
 // </copyright>
 
-import axios from './axiosJWTDecorator';
+import axios from './httpClient';
 import { getBaseUrl } from '../configVariables';
 
 let baseAxiosUrl = getBaseUrl() + '/api';
