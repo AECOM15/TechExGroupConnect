@@ -1,4 +1,4 @@
-﻿// <copyright file="employeeResourceGroupApi.ts" company="Microsoft Corporation">
+// <copyright file="employeeResourceGroupApi.ts" company="Microsoft Corporation">
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 // </copyright>

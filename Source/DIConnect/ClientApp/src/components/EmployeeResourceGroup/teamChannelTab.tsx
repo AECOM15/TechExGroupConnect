@@ -1,4 +1,4 @@
-﻿// <copyright file="teamChannelTab.tsx" company="Microsoft Corporation">
+// <copyright file="teamChannelTab.tsx" company="Microsoft Corporation">
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 // </copyright>

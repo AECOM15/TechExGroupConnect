@@ -1,4 +1,4 @@
-﻿// <copyright file="popupMenuCheckboxesContent.test.tsx" company="Microsoft Corporation">
+// <copyright file="popupMenuCheckboxesContent.test.tsx" company="Microsoft Corporation">
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 // </copyright>

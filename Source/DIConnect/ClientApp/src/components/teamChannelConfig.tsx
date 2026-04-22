@@ -1,4 +1,4 @@
-﻿// <copyright file="teamChannelConfig.tsx" company="Microsoft Corporation">
+// <copyright file="teamChannelConfig.tsx" company="Microsoft Corporation">
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 // </copyright>

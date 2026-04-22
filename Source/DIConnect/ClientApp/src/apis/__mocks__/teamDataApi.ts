@@ -1,4 +1,4 @@
-﻿// <copyright file="teamDataApi.tsx" company="Microsoft Corporation">
+// <copyright file="teamDataApi.tsx" company="Microsoft Corporation">
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 // </copyright>
