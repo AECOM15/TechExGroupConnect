@@ -75,6 +75,10 @@ IF !ERRORLEVEL! NEQ 0 goto error
 echo Restoring npm packages (this can take several minutes)
 pushd "%DEPLOYMENT_SOURCE%\Source\DIConnect\ClientApp"
 
+:: Clean node_modules to avoid stale cache issues
+if exist node_modules rmdir /s /q node_modules
+if exist package-lock.json del /f /q package-lock.json
+
 call :ExecuteCmd npm install --no-audit
 IF !ERRORLEVEL! NEQ 0 (
     echo First attempt failed, retrying once
@@ -86,7 +90,9 @@ IF !ERRORLEVEL! NEQ 0 goto error
 :: 3. Build the client app
 echo Building the client app (this can take several minutes)
 pushd "%DEPLOYMENT_SOURCE%\Source\DIConnect\ClientApp"
+SET NODE_OPTIONS=--openssl-legacy-provider
 call :ExecuteCmd npm run build
+SET NODE_OPTIONS=
 popd
 IF !ERRORLEVEL! NEQ 0 goto error
 
