@@ -61,25 +61,30 @@ namespace Microsoft.Teams.Apps.DIConnect.Authentication
 
             var oidClaim = context.User.Claims.FirstOrDefault(p => Constants.ClaimTypeUserId.Equals(p.Type, StringComparison.OrdinalIgnoreCase));
 
+            // In ASP.NET Core 3.0+ with endpoint routing, context.Resource is HttpContext (not AuthorizationFilterContext).
+            // Fall back to AuthorizationFilterContext for older pipelines / MVC filters.
+            HttpContext httpContext = context.Resource as HttpContext;
+            if (httpContext == null && context.Resource is AuthorizationFilterContext authorizationFilterContext)
+            {
+                httpContext = authorizationFilterContext.HttpContext;
+            }
+
             foreach (var requirement in context.Requirements)
             {
                 if (requirement is MustBeTeamMemberRequirement)
                 {
-                    if (context.Resource is AuthorizationFilterContext authorizationFilterContext)
+                    if (httpContext != null && !string.IsNullOrEmpty(httpContext.Request.QueryString.Value))
                     {
                         // Wrap the request stream so that we can rewind it back to the start for regular request processing.
-                        authorizationFilterContext.HttpContext.Request.EnableBuffering();
+                        httpContext.Request.EnableBuffering();
 
-                        if (!string.IsNullOrEmpty(authorizationFilterContext.HttpContext.Request.QueryString.Value))
+                        var requestQuery = httpContext.Request.Query;
+                        string groupId = requestQuery.Where(queryData => queryData.Key == "groupId").Select(queryData => queryData.Value.ToString()).FirstOrDefault();
+
+                        // Check if current sign-in user is the part of team.
+                        if (!string.IsNullOrEmpty(groupId) && oidClaim != null && await this.IsTeamMemberAsync(groupId, oidClaim.Value))
                         {
-                            var requestQuery = authorizationFilterContext.HttpContext.Request.Query;
-                            string groupId = requestQuery.Where(queryData => queryData.Key == "groupId").Select(queryData => queryData.Value.ToString()).FirstOrDefault();
-
-                            // Check if current sign-in user is the part of team.
-                            if (await this.IsTeamMemberAsync(groupId, oidClaim.Value))
-                            {
-                                context.Succeed(requirement);
-                            }
+                            context.Succeed(requirement);
                         }
                     }
                 }
